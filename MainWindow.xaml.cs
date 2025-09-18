@@ -18,9 +18,43 @@ namespace Calculadora
     public partial class MainWindow : Window
     {
         private float numero1;
-        private string operador;
+        private string operador = "";
         private bool isResult = false;
         private bool comma = false;
+
+        private string Operar()
+        {
+            string res = "";
+            switch (operador)
+            {
+                case "X":
+                    res = (numero1 * float.Parse(operacion.Content.ToString())).ToString();
+                    
+                    break;
+                case "/":
+                    if (float.Parse(operacion.Content.ToString()) == 0)
+                    {
+                        res = "Error";
+
+                    }
+                    else
+                    {
+                        res = (numero1 / float.Parse(operacion.Content.ToString())).ToString();
+                    }
+                    
+                    break;
+                case "+":
+                    res = (numero1 + float.Parse(operacion.Content.ToString())).ToString();
+                    
+                    break;
+                case "-":
+                    res = (numero1 - float.Parse(operacion.Content.ToString())).ToString();
+                    
+                    break;
+            }
+
+            return res;
+        }
 
         public MainWindow()
         {
@@ -30,6 +64,10 @@ namespace Calculadora
         private void ClicNumero(object sender, RoutedEventArgs e)
         {
             Button Sen = sender as Button;
+            if (operacion.Content != null && operacion.Content.Equals("Error"))
+            {
+                operacion.Content = "";
+            }
             if (isResult)
             {
                 operacion.Content = "";
@@ -47,9 +85,6 @@ namespace Calculadora
                 
             }
 
-            Console.WriteLine(comma);
-            Console.WriteLine(Sen.Content.Equals(","));
-
             if (!Sen.Content.Equals(",") || !comma) 
             {
                 operacion.Content += Sen.Content.ToString();
@@ -60,43 +95,39 @@ namespace Calculadora
         private void Operador(object sender, RoutedEventArgs e)
         {
             Button op = sender as Button;
+            string resultado = Operar();
+            if (!isResult && operador != "") 
+            {
+                if (!resultado.Equals("Error"))
+                {
+                    numero1 = float.Parse(resultado);
+                    operacion.Content = "";
+                    operador = op.Content.ToString();
+                }
+                else
+                {
+                    operacion.Content = resultado;
+                    numero1 = 0;
+                }
+            }
+            else 
+            {
+                numero1 = operacion.Content.ToString() != "Error" ? float.Parse(operacion.Content.ToString()) : 0;
+                operacion.Content = "";
+                operador = op.Content.ToString();
+            }
+
             comma = false;
-            operador = op.Content.ToString();
-            numero1 = operacion.Content.ToString() != "Error" ? float.Parse(operacion.Content.ToString()) : 0;
-            operacion.Content = "";
+            
+            
         }
 
         private void RealizarOperacion(object sender, RoutedEventArgs e)
         {
-            
-                switch (operador)
-                {
-                    case "X":
-                        operacion.Content = (numero1 * float.Parse(operacion.Content.ToString())).ToString();
-                        isResult = true;
-                        break;
-                    case "/":
-                        if (float.Parse(operacion.Content.ToString()) == 0)
-                        {
-                            operacion.Content = "Error"; 
-                            
-                        }else
-                        {
-                            operacion.Content = (numero1 / float.Parse(operacion.Content.ToString())).ToString();
-                        }
-                        isResult = true;
-                        break;
-                    case "+":
-                        operacion.Content = (numero1 + float.Parse(operacion.Content.ToString())).ToString();
-                        isResult = true;
-                        break;
-                    case "-":
-                        operacion.Content = (numero1 - float.Parse(operacion.Content.ToString())).ToString();
-                        isResult = true;
-                        break;
-                }
-
-            
+           
+            operacion.Content = Operar();
+            isResult = true;
+            operador = "";
         }
 
         private void Borrar(object sender, RoutedEventArgs e)
